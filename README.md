@@ -132,8 +132,8 @@ Your auth layer is ready. Endpoints, token issuance, refresh, roles, policies �
 - **Toggleable everything** — Don't load what you don't need
 - **Configurable** — every default can be overridden
 - **Modular** — Core is DB-agnostic, providers are separate packages
-- **Fintech ready** — audit logging, token binding, rate limiting, suspicious activity detection
-- **MVP friendly** — turn off everything you don't need and ship fast
+- **Built for any environment that demands reliability — fintech, healthcare or an e-commerce** — audit logging, token binding, rate limiting, suspicious activity detection
+- **Weekend MVP friendly** — turn off everything you don't need and ship fast
 
 ---
 
