@@ -129,7 +129,7 @@ Your auth layer is ready. Endpoints, token issuance, refresh, roles, policies �
 
 ## Philosophy
 
-- **Toggleable everything** — don't pay for what you don't use
+- **Toggleable everything** — Don't load what you don't need
 - **Configurable** — every default can be overridden
 - **Modular** — Core is DB-agnostic, providers are separate packages
 - **Fintech ready** — audit logging, token binding, rate limiting, suspicious activity detection
