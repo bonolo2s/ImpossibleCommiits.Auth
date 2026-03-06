@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ImpossibleCommits.Auth.Core.Options
+﻿namespace ImpossibleCommits.Auth.Core.Options
 {
-    internal class JwtOptions
+    public class JwtOptions
     {
+        public string Secret { get; set; } = string.Empty;
+        public string Issuer { get; set; } = string.Empty;
+        public string Audience { get; set; } = string.Empty;
+        public TimeSpan AccessTokenExpiry { get; set; } = TimeSpan.FromMinutes(15);
+        public TimeSpan RefreshTokenExpiry { get; set; } = TimeSpan.FromDays(7);
+        public bool EnableRotation { get; set; } = true;
+        public bool EnableTokenBinding { get; set; } = false;
     }
 }

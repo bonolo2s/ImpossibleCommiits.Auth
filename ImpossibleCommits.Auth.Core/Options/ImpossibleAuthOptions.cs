@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ImpossibleCommits.Auth.Core.Options;
 
-namespace ImpossibleCommits.Auth.Core.Options
+public class ImpossibleAuthOptions
 {
-    internal class ImpossibleAuthOptions
-    {
-    }
+    public JwtOptions Jwt { get; set; } = new();
+    public PasswordOptions Password { get; set; } = new();
+    public RateLimitOptions RateLimit { get; set; } = new();
+    public AuditOptions Audit { get; set; } = new();
 }

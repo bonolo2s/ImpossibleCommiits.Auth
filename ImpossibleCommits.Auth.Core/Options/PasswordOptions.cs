@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ImpossibleCommits.Auth.Core.Options
+﻿namespace ImpossibleCommits.Auth.Core.Options
 {
-    internal class PasswordOptions
+    public class PasswordOptions
     {
+        public int MinLength { get; set; } = 8;
+        public bool RequireUppercase { get; set; } = true;
+        public bool RequireLowercase { get; set; } = true;
+        public bool RequireDigit { get; set; } = true;
+        public bool RequireSpecialChar { get; set; } = true;
+        public int? ExpiryDays { get; set; } = null;
+        public int PasswordHistoryLimit { get; set; } = 5;
     }
 }
