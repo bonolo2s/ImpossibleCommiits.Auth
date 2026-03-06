@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ImpossibleCommits.Auth.Core.Interfaces
+﻿namespace ImpossibleCommits.Auth.Core.Interfaces
 {
-    internal interface IRateLimitService
+    public interface IRateLimitService
     {
+        bool IsAllowed(string userId, string action);
+        void RecordAttempt(string userId, string action);
+        int GetRemainingAttempts(string userId, string action);
+        void Reset(string userId, string action);
     }
 }

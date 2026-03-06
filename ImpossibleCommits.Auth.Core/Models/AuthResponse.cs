@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ImpossibleCommits.Auth.Core.Models
 {
-    internal class AuthResponse
+    public class AuthResponse
     {
     }
 }

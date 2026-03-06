@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ImpossibleCommits.Auth.Core.Interfaces
 {
-    internal interface IEmailService
+    public interface IEmailService
     {
     }
 }

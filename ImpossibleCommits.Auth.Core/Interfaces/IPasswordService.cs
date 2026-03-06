@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ImpossibleCommits.Auth.Core.Interfaces
+﻿namespace ImpossibleCommits.Auth.Core.Interfaces
 {
-    internal interface IPasswordService
+    public interface IPasswordService
     {
+        bool MeetsStrengthRequirements(string password);
+        bool IsExpired(DateTime lastChanged, int expiryDays);
+        bool IsReused(string newHash, IEnumerable<string> previousHashes);
+        string GeneratePasswordResetToken(string userId);
+        bool ValidatePasswordResetToken(string userId, string token);
     }
 }
