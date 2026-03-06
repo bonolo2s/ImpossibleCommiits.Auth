@@ -2,18 +2,6 @@
 
 > **Your vision, engineered to perfection.**
 
-A modular, production-ready authentication library for ASP.NET Core — built by a developer who got tired of re-implementing auth from scratch on every project.
-
----
-
-## The Story
-
-Every .NET project needs auth. JWT, roles, password policies, rate limiting, audit logging — the same boilerplate, over and over again. Whether it's a fintech platform or a simple MVP, the foundation is always the same.
-
-**ImpossibleCommits.Auth** was born out of that frustration. The# ImpossibleCommits.Auth
-
-> **Your vision, engineered to perfection.**
-
 A lightweight, stateless authentication toolbox for ASP.NET Core — built by a developer who got tired of re-implementing auth from scratch on every project.
 
 ---
@@ -52,27 +40,21 @@ No migrations. No base classes to extend. No providers to install. Just methods.
 ### JWT
 - **Generate access tokens** — configurable expiry, claims, issuer, audience
 - **Generate refresh tokens** — with rotation support
-- **Validate tokens** — returns claims or rejection reason
-- **Token binding** — tie tokens to a specific client/device *(toggleable)*
+- **Validate tokens** — returns claims or null
+- **Token binding** — tie tokens to a specific client/device *(configurable)*
+- **Revoke tokens** — invalidate tokens on logout or suspicious activity
 
-### Email Notifications *(toggleable)*
-- Registration confirmation
-- Password reset
-- Suspicious activity alert
-- Pass your own SMTP config — library handles the sending
+### Rate Limiting
+- **User-aware limiting** — limit by userId, not IP
+- **Per action** — login, password reset, token refresh each have independent counters
+- **Configurable window and max attempts** per action type
+- You pass in the attempt count from your own storage — library evaluates, stays stateless
 
-### Rate Limiting *(toggleable)*
-- Protect any endpoint or operation
-- Configurable max requests and window
-
-### Audit Logging *(toggleable)*
-- Returns structured audit data on key events
-- Login attempts, failures, token usage, password changes
+### Audit Logging
+- Returns structured `AuditEvent` data on key auth events
+- Login attempts, failed logins, token usage, token refresh, token revocation
+- Password changes, password reset requests, suspicious activity, logout
 - You persist it wherever you want — your DB, a file, a cloud logger
-
-### Access Control *(toggleable)*
-- Role-based access control helpers
-- Policy-based authorization helpers
 
 ---
 
@@ -91,6 +73,8 @@ builder.Services.AddImpossibleAuth(options =>
 {
     // JWT
     options.Jwt.Secret = "your-secret-key";
+    options.Jwt.Issuer = "your-app";
+    options.Jwt.Audience = "your-users";
     options.Jwt.AccessTokenExpiry = TimeSpan.FromMinutes(15);
     options.Jwt.RefreshTokenExpiry = TimeSpan.FromDays(7);
     options.Jwt.EnableRotation = true;
@@ -98,21 +82,19 @@ builder.Services.AddImpossibleAuth(options =>
 
     // Password
     options.Password.MinLength = 8;
-    options.Password.RequireSpecialChar = true;
     options.Password.RequireUppercase = true;
+    options.Password.RequireSpecialChar = true;
     options.Password.ExpiryDays = 90; // null = never expires
 
-    // Email
-    options.Email.Enabled = true;
-    options.Email.FromAddress = "noreply@yourapp.com";
-    options.Email.FromName = "Your App";
-    options.Email.SmtpHost = "smtp.yourprovider.com";
-    options.Email.SmtpPort = 587;
+    // Rate Limiting
+    options.RateLimit.MaxLoginAttempts = 5;
+    options.RateLimit.MaxPasswordResetAttempts = 3;
+    options.RateLimit.Window = TimeSpan.FromMinutes(10);
 
-    // Features
-    options.EnableRateLimiting = true;
-    options.EnableAuditLogging = true;
-    options.EnableRBAC = false;
+    // Audit
+    options.Audit.LogSuccessfulLogins = true;
+    options.Audit.LogFailedLogins = true;
+    options.Audit.LogSuspiciousActivity = true;
 });
 ```
 
@@ -122,14 +104,19 @@ builder.Services.AddImpossibleAuth(options =>
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _auth;
+    private readonly IAuditService _audit;
 
-    public AuthController(IAuthService auth) => _auth = auth;
+    public AuthController(IAuthService auth, IAuditService audit)
+    {
+        _auth = auth;
+        _audit = audit;
+    }
 
     [HttpPost("register")]
     public IActionResult Register(RegisterDto dto)
     {
         var hash = _auth.HashPassword(dto.Password);
-        // store hash in your own DB however you want
+        // store hash in your own DB
         return Ok(new { PasswordHash = hash });
     }
 
@@ -140,9 +127,13 @@ public class AuthController : ControllerBase
         var user = _yourUserRepo.GetByEmail(dto.Email);
 
         var valid = _auth.VerifyPassword(dto.Password, user.PasswordHash);
+
+        var auditEvent = _audit.LogLoginAttempt(user.Id.ToString(), HttpContext.Connection.RemoteIpAddress?.ToString(), valid);
+        // persist auditEvent in your own DB
+
         if (!valid) return Unauthorized();
 
-        var token = _auth.GenerateToken(user.Id.ToString(), claims: new[]
+        var token = _auth.GenerateToken(user.Id.ToString(), new[]
         {
             new Claim("email", user.Email)
         });
@@ -157,7 +148,6 @@ public class AuthController : ControllerBase
 ## Philosophy
 
 - **Stateless by design** — no DB, no migrations, no lock-in
-- **Toggleable everything** — don't load what you don't need
 - **Configurable** — every default can be overridden
 - **You own your data** — library returns results, you decide what to do with them
 - **Built for any scale** — fintech, healthcare, e-commerce, or a weekend MVP
@@ -166,158 +156,15 @@ public class AuthController : ControllerBase
 
 ## Roadmap
 
-- [ ] v1 — Password hashing, JWT generation & validation, password reset tokens
-- [ ] v1.1 — Email notifications (registration, reset, suspicious activity)
-- [ ] v1.2 — Rate limiting, audit logging
-- [ ] v2 — OAuth2/OpenID Connect, RBAC helpers, policy authorization helpers
+- [ ] v1 — Password hashing, JWT generation & validation, password reset tokens, rate limiting helpers, audit logging helpers
+- [ ] v1.1 — OAuth2/OpenID Connect support
+- [ ] v2 — Advanced token binding, anomaly detection helpers
 
 ---
 
 ## Contributing
 
 Open to contributions. If you find a bug or have a feature request, open an issue.
-
----
-
-*ImpossibleCommits — Your vision, engineered to perfection.* goal is simple: drop it in, configure what you need, ignore what you don't. No bloat, no lock-in, no compromises.
-
-Built flexible enough for production fintech systems. Simple enough for your next MVP.
-
----
-
-## Features
-
-### Core
-- **JWT Authentication** — access tokens, refresh tokens, and automatic rotation
-- **Token Binding** — ties tokens to a specific client/device, rejects stolen tokens used from a different origin *(toggleable)*
-- **Password Policies** — configurable strength rules, expiry, and history enforcement
-- **Password Recovery** — secure token-based reset flow
-- **OAuth2 / OpenID Connect** — social and third-party login support *(toggleable)*
-
-### Access Control
-- **Role-Based Access Control (RBAC)** — flexible role definitions per project *(toggleable)*
-- **Policy-Based Authorization** — define custom policies to match your business rules *(toggleable)*
-
-### Advanced / Extras
-- **Rate Limiting** — protect your endpoints from abuse *(toggleable)*
-- **Audit Logging** — track login attempts, failed logins, token usage, and key auth events *(toggleable)*
-  - Event hooks: registration, password change, token refresh, suspicious activity
-- **Email Notifications** — bring your own email provider and templates *(toggleable)*
-  - Registration confirmation
-  - Password reset
-  - Suspicious activity alerts
-  - Custom sender address and content per notification type
-
----
-
-## DB Agnostic
-
-ImpossibleCommits.Auth works with any database. The library uses a generic `TKey` type parameter so your key type matches your DB:
-
-| Database | Key Type |
-|---|---|
-| SQL Server / PostgreSQL | `Guid` |
-| MongoDB | `string` |
-| MySQL / SQLite | `int` or `Guid` |
-
-Install the Core package plus the provider that matches your database:
-
-```
-ImpossibleCommits.Auth.Core          // always required
-ImpossibleCommits.Auth.EFCore        // for SQL Server, PostgreSQL, MySQL, SQLite
-ImpossibleCommits.Auth.MongoDB       // for MongoDB
-```
-
----
-
-## Extensible User Model
-
-Your project has custom user fields. We know. Extend the base entity and pass your type in:
-
-```csharp
-public class AppUser : AuthUser<Guid>
-{
-    public string FullName { get; set; }
-    public string ProfilePicture { get; set; }
-}
-```
-
-Then register with your custom type:
-
-```csharp
-builder.Services.AddImpossibleAuth<AppUser, Guid>(options => { ... });
-```
-
----
-
-## Quick Start
-
-### 1. Install packages
-
-```bash
-dotnet add package ImpossibleCommits.Auth.Core
-dotnet add package ImpossibleCommits.Auth.EFCore
-```
-
-### 2. Register in Program.cs
-
-```csharp
-builder.Services.AddImpossibleAuth<AppUser, Guid>(options =>
-{
-    // JWT
-    options.Jwt.AccessTokenExpiry = TimeSpan.FromMinutes(15);
-    options.Jwt.EnableRotation = true;
-    options.Jwt.EnableTokenBinding = true;
-
-    // Password
-    options.Password.MinLength = 8;
-    options.Password.RequireSpecialChar = true;
-    options.Password.ExpiryDays = 90;
-
-    // Features
-    options.EnableRateLimiting = true;
-    options.EnableAuditLogging = true;
-    options.EnableRBAC = true;
-    options.EnablePolicyAuthorization = true;
-    options.EnableOAuth = false;
-
-    // Email
-    options.Email.Enabled = true;
-    options.Email.FromAddress = "noreply@yourapp.com";
-    options.Email.FromName = "Your App";
-})
-.UseEFCore(connectionString)
-.UseSqlServer();
-```
-
-### 3. Done.
-
-Your auth layer is ready. Endpoints, token issuance, refresh, roles, policies — all wired up.
-
----
-
-## Philosophy
-
-- **Toggleable everything** — Don't load what you don't need
-- **Configurable** — every default can be overridden
-- **Modular** — Core is DB-agnostic, providers are separate packages
-- **Built for any environment that demands reliability — fintech, healthcare or an e-commerce** — audit logging, token binding, rate limiting, suspicious activity detection
-- **Weekend MVP friendly** — turn off everything you don't need and ship fast
-
----
-
-## Roadmap
-
-- [ ] v1 — Core auth, JWT, RBAC, EFCore + MongoDB providers
-- [ ] v1.1 — OAuth2/OpenID support
-- [ ] v1.2 — Email notifications
-- [ ] v2 — Dapper provider, advanced audit log exporters
-
----
-
-## Contributing
-
-This library is open to contributions. If you find a bug or have a feature request, open an issue.
 
 ---
 
