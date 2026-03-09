@@ -90,15 +90,5 @@ namespace ImpossibleCommits.Auth.Core.Services
             rng.GetBytes(bytes);
             return Convert.ToBase64String(bytes);
         }
-
-        public bool ValidateRefreshToken(string token)
-        {
-            return !string.IsNullOrWhiteSpace(token);
-        }
-
-        public bool RevokeToken(string token)
-        {
-            return true;
-        }
     }
 }
