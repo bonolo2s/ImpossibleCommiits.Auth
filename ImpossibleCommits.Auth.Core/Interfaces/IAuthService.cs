@@ -12,6 +12,5 @@ namespace ImpossibleCommits.Auth.Core.Interfaces
         string GenerateRefreshToken();
         bool ValidateRefreshToken(string token);
         bool RevokeToken(string token);
-        void Logout(string userId);
     }
 }
