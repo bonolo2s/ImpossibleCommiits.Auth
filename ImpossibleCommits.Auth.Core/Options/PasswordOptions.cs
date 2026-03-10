@@ -7,7 +7,6 @@
         public bool RequireLowercase { get; set; } = true;
         public bool RequireDigit { get; set; } = true;
         public bool RequireSpecialChar { get; set; } = true;
-        public int? ExpiryDays { get; set; } = null;
-        public int PasswordHistoryLimit { get; set; } = 5;
+        public int? PasswordExpiryDays { get; set; } = null;
     }
 }

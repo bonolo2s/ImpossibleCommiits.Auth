@@ -10,7 +10,5 @@ namespace ImpossibleCommits.Auth.Core.Interfaces
         AuthToken GenerateToken(string userId, IEnumerable<Claim> claims);
         IEnumerable<Claim>? ValidateToken(string token);
         string GenerateRefreshToken();
-        bool ValidateRefreshToken(string token);
-        bool RevokeToken(string token);
     }
 }

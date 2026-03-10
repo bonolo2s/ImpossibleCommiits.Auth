@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ImpossibleCommits.Auth.Core.Services
 {
-    internal class PasswordService
+    public class PasswordService
     {
     }
 }
