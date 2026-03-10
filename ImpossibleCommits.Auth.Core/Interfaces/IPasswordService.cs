@@ -5,7 +5,6 @@
         bool MeetsStrengthRequirements(string password);
         bool IsExpired(DateTime lastChanged, int expiryDays);
         bool IsReused(string newHash, IEnumerable<string> previousHashes);
-        string GeneratePasswordResetToken(string userId);
-        bool ValidatePasswordResetToken(string userId, string token);
+        string GeneratePasswordResetToken(string userId); 
     }
 }
