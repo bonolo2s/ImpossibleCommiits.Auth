@@ -2,7 +2,7 @@
 {
     public interface IRateLimitService
     {
-        bool IsAllowed(string userId, string action);
+        bool IsAllowed(string action, int attemptCount, DateTime windowStart); //pass options ill enforce for you
         void Reset(string userId, string action);
     }
 }
