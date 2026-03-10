@@ -81,6 +81,7 @@ namespace ImpossibleCommits.Auth.Core.Services
             {
                 return null;
             }
+
         }
 
         public string GenerateRefreshToken()
