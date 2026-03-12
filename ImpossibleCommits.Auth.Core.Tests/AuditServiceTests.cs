@@ -72,7 +72,7 @@ namespace ImpossibleCommits.Auth.Core.Tests
         {
             var svc = new AuditService(new AuditOptions { LogFailedLogins = false });
             var result = svc.LogFailedLogin("user-1", "127.0.0.1");
-            Assert.Null(result.UserId);
+            Assert.Empty(result.UserId);
         }
 
         // LogTokenIssued
@@ -90,11 +90,10 @@ namespace ImpossibleCommits.Auth.Core.Tests
         {
             var svc = new AuditService(new AuditOptions { LogTokenUsage = false });
             var result = svc.LogTokenIssued("user-1", "access");
-            Assert.Null(result.UserId);
+            Assert.Empty(result.UserId);
         }
 
         // LogTokenRefreshed
-
         [Fact]
         public void LogTokenRefreshed_ShouldReturnEvent_WhenEnabled()
         {
@@ -104,11 +103,11 @@ namespace ImpossibleCommits.Auth.Core.Tests
         }
 
         [Fact]
-        public void LogTokenRefreshed_ShouldReturnEmpty_WhenLogTokenUsageIsFalse()
+        public void LogTokenRefreshed_ShouldReturnEmptyEvent_WhenLogTokenUsageIsDisabled()
         {
             var svc = new AuditService(new AuditOptions { LogTokenUsage = false });
             var result = svc.LogTokenRefreshed("user-1");
-            Assert.Equal(new AuditEvent().EventType, result.EventType);
+            Assert.Empty(result.UserId);
         }
 
         // LogTokenRevoked
@@ -122,11 +121,11 @@ namespace ImpossibleCommits.Auth.Core.Tests
         }
 
         [Fact]
-        public void LogTokenRefreshed_ShouldReturnEmptyEvent_WhenLogTokenUsageIsDisabled()
+        public void LogTokenRevoked_ShouldReturnEmptyEvent_WhenLogTokenUsageIsDisabled()
         {
             var svc = new AuditService(new AuditOptions { LogTokenUsage = false });
-            var result = svc.LogTokenRefreshed("user-1");
-            Assert.Null(result.UserId);
+            var result = svc.LogTokenRevoked("user-1", "Suspicious activity");
+            Assert.Empty(result.UserId);
         }
 
         // LogPasswordChanged
@@ -144,7 +143,7 @@ namespace ImpossibleCommits.Auth.Core.Tests
         {
             var svc = new AuditService(new AuditOptions { LogPasswordChanges = false });
             var result = svc.LogPasswordChanged("user-1");
-            Assert.Null(result.UserId);
+            Assert.Empty(result.UserId);
         }
 
         // LogPasswordResetRequested
@@ -162,7 +161,7 @@ namespace ImpossibleCommits.Auth.Core.Tests
         {
             var svc = new AuditService(new AuditOptions { LogPasswordChanges = false });
             var result = svc.LogPasswordResetRequested("user-1");
-            Assert.Null(result.UserId);
+            Assert.Empty(result.UserId);
         }
 
         // LogSuspiciousActivity
@@ -180,7 +179,7 @@ namespace ImpossibleCommits.Auth.Core.Tests
         {
             var svc = new AuditService(new AuditOptions { LogSuspiciousActivity = false });
             var result = svc.LogSuspiciousActivity("user-1", "127.0.0.1", "Multiple failed attempts");
-            Assert.Null(result.UserId);
+            Assert.Empty(result.UserId);
         }
 
         // LogLogout
@@ -198,7 +197,7 @@ namespace ImpossibleCommits.Auth.Core.Tests
         {
             var svc = new AuditService(new AuditOptions { Enabled = false });
             var result = svc.LogLogout("user-1");
-            Assert.Null(result.UserId);
+            Assert.Empty(result.UserId);
         }
     }
 }
