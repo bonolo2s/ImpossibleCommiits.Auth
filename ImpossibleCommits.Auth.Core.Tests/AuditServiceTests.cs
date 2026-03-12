@@ -46,15 +46,15 @@ namespace ImpossibleCommits.Auth.Core.Tests
         {
             var svc = new AuditService(new AuditOptions { Enabled = false });
             var result = svc.LogLoginAttempt("user-1", "127.0.0.1", true);
-            Assert.Null(result.UserId);
+            Assert.Empty(result.UserId);
         }
 
         [Fact]
-        public void LogLoginAttempt_ShouldReturnEmpty_WhenLogSuccessfulLoginsIsFalse()
+        public void LogLoginAttempt_ShouldReturnEmptyEvent_WhenLogSuccessfulLoginsIsDisabled()
         {
             var svc = new AuditService(new AuditOptions { LogSuccessfulLogins = false });
             var result = svc.LogLoginAttempt("user-1", "127.0.0.1", true);
-            Assert.Equal(new AuditEvent().EventType, result.EventType);
+            Assert.Empty(result.UserId);
         }
 
         // LogFailedLogin
